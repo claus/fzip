@@ -412,7 +412,7 @@ package deng.fzip
 		 * @private
 		 */		
 		protected function parse(stream:IDataInput):Boolean {
-			while (parseFunc(stream));
+			while (parseFunc(stream)) {}
 			return (parseFunc === parseIdle);
 		}
 
@@ -446,7 +446,7 @@ package deng.fzip
 						parseFunc = parseIdle;
 						break;
 					default:
-						throw(new Error("Unknown record signature."));
+						throw(new Error("Unknown record signature: 0x" + sig.toString(16)));
 						break;
 				}
 				return true;

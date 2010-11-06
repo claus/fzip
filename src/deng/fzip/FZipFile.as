@@ -105,7 +105,11 @@ package deng.fzip
 		/**
 		 * @private
 		 */		
-		protected static var HAS_INFLATE:Boolean = describeType(ByteArray).factory.method.(@name == "uncompress").hasComplexContent();
+		protected static var HAS_UNCOMPRESS:Boolean = (describeType(ByteArray).factory.method.(@name == "uncompress").parameter.length() > 0);
+		/**
+		 * @private
+		 */		
+		protected static var HAS_INFLATE:Boolean = (describeType(ByteArray).factory.method.(@name == "inflate").length() > 0);
 		
 		/**
 		 * Constructor
@@ -367,7 +371,7 @@ package deng.fzip
 			var fileSize:uint = 0;
 			if(!centralDir && _content.length > 0) {
 				if(isCompressed) {
-					if(HAS_INFLATE) {
+					if(HAS_UNCOMPRESS || HAS_INFLATE) {
 						fileSize = _content.length;
 						stream.writeBytes(_content, 0, fileSize);
 					} else {
@@ -391,7 +395,7 @@ package deng.fzip
 		 * @private
 		 */		
 		internal function parse(stream:IDataInput):Boolean {
-			while (stream.bytesAvailable && parseFunc(stream));
+			while (stream.bytesAvailable && parseFunc(stream)) {}
 			return (parseFunc === parseFileIdle);
 		}
 
@@ -526,7 +530,7 @@ package deng.fzip
 		 */		
 		internal function parseContent(data:IDataInput):void {
 			if(_compressionMethod === COMPRESSION_DEFLATED && !_encrypted) {
-				if(HAS_INFLATE) {
+				if(HAS_UNCOMPRESS || HAS_INFLATE) {
 					// Adobe Air supports inflate decompression.
 					// If we got here, this is an Air application
 					// and we can decompress without using the Adler32 hack
@@ -567,6 +571,9 @@ package deng.fzip
 					_content.position = 0;
 					_sizeUncompressed = _content.length;
 					if(HAS_INFLATE) {
+						_content.deflate();
+						_sizeCompressed = _content.length;
+					} else if(HAS_UNCOMPRESS) {
 						_content.compress.apply(_content, ["deflate"]);
 						_sizeCompressed = _content.length;
 					} else {
@@ -589,6 +596,8 @@ package deng.fzip
 			if(isCompressed && _content.length > 0) {
 				_content.position = 0;
 				if(HAS_INFLATE) {
+					_content.inflate();
+				} else if(HAS_UNCOMPRESS) {
 					_content.uncompress.apply(_content, ["deflate"]);
 				} else {
 					_content.uncompress();

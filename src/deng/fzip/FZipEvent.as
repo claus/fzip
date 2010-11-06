@@ -73,5 +73,14 @@ package deng.fzip
 		override public function clone():Event {
 			return new FZipEvent(type, file, bubbles, cancelable);
 		}
+		
+		/**
+		 * TODO
+		 * 
+		 * @return String
+		 */		
+		override public function toString():String {
+			return "[FZipEvent type=\"" + type + "\" filename=\"" + file.filename + "\" bubbles=" + bubbles + " cancelable=" + cancelable + " eventPhase=" + eventPhase + "]";
+		}
 	}
 }
