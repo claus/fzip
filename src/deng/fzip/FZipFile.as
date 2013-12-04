@@ -168,14 +168,13 @@ package deng.fzip
 		 * @param doCompress Compress the data after adding.
 		 */
 		public function setContent(data:ByteArray, doCompress:Boolean = true):void {
+			_content.clear();
 			if(data != null && data.length > 0) {
 				data.position = 0;
 				data.readBytes(_content, 0, data.length);
 				_crc32 = ChecksumUtil.CRC32(_content);
 				_hasAdler32 = false;
 			} else {
-				_content.length = 0;
-				_content.position = 0;
 				isCompressed = false;
 			}
 			if(doCompress) {
